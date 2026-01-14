@@ -1,6 +1,6 @@
 {
 	"name": "@zelelo/snake-cli-game",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"license": "MIT",
 	"bin": {
 		"snake-cli-game": "./dist/cli.js"

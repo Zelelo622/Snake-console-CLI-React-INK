@@ -2,6 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {Text, Box, useApp, useInput} from 'ink';
 import {useInterval} from './hooks/useInterval.js';
 
+const SLOW_SPEED = 150;
+const MIDDLE_SPEED = 110;
+const FAST_SPEED = 70;
 const FIELD_SIZE = 16;
 const FIELD_ROW = [...new Array(FIELD_SIZE).keys()];
 
@@ -67,12 +70,20 @@ function limitByField(x) {
 	return x;
 }
 
+const getSpeedLevel = currentDelay => {
+	if (currentDelay === SLOW_SPEED) return '1';
+	if (currentDelay  === MIDDLE_SPEED) return '2';
+	return '3';
+};
+
 export default function App() {
 	const {exit} = useApp();
 	const [snakeSegments, setSnakeSegments] = useState(INITIAL_SNAKE);
 	const [direction, setDirection] = useState(INITIAL_DIRECTION);
 	const [foodItem, setFoodItem] = useState({x: 10, y: 10});
 	const [score, setScore] = useState(0);
+
+	const [delay, setDelay] = useState(MIDDLE_SPEED);
 
 	const [head, ...tail] = snakeSegments;
 	const intersectsWithItself = tail.some(
@@ -84,6 +95,7 @@ export default function App() {
 		setDirection(INITIAL_DIRECTION);
 		setFoodItem(generateFood(INITIAL_SNAKE));
 		setScore(0);
+		setDelay(MIDDLE_SPEED);
 	};
 
 	useInterval(
@@ -92,12 +104,16 @@ export default function App() {
 				newSnakePosition(segments, direction, foodItem),
 			);
 		},
-		intersectsWithItself ? null : 100,
+		intersectsWithItself ? null : delay,
 	);
 
 	useInput((input, key) => {
 		if (input === 'q') exit();
 		if (input === 'r') restartGame();
+
+		if (input === '1') setDelay(SLOW_SPEED);
+		if (input === '2') setDelay(MIDDLE_SPEED);
+		if (input === '3') setDelay(FAST_SPEED);
 
 		if (key.upArrow && direction !== DIRECTIONS.BOTTOM)
 			setDirection(DIRECTIONS.TOP);
@@ -129,11 +145,19 @@ export default function App() {
 				Snake CLI 🐍{' '}
 			</Text>
 
-			<Box marginY={1}>
-				<Text>Score: </Text>
-				<Text color="yellow" bold>
-					{score}
-				</Text>
+			<Box marginY={1} flexDirection="row">
+				<Box marginRight={2}>
+					<Text>Score: </Text>
+					<Text color="yellow" bold>
+						{score}
+					</Text>
+				</Box>
+				<Box>
+					<Text>Speed: </Text>
+					<Text color="magenta" bold>
+						{getSpeedLevel(delay)}
+					</Text>
+				</Box>
 			</Box>
 
 			{intersectsWithItself ? (
@@ -165,6 +189,11 @@ export default function App() {
 
 			<Box marginTop={1} flexDirection="column" alignItems="center">
 				<Text dimColor>----------------------------</Text>
+				<Text>
+					{' '}
+					Speed: <Text color="blue">1</Text>-Slow | <Text color="blue">2</Text>
+					-Mid | <Text color="blue">3</Text>-Fast{' '}
+				</Text>
 				<Text>
 					Use{' '}
 					<Text color="magenta" bold>

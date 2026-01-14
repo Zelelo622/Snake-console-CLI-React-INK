@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Text, Box, useApp, useInput} from 'ink';
 import {useInterval} from './hooks/useInterval.js';
+import { Header } from './components/Header.js';
 
 const SLOW_SPEED = 150;
 const MIDDLE_SPEED = 110;
@@ -140,10 +141,7 @@ export default function App() {
 			borderColor="cyan"
 			paddingX={1}
 		>
-			<Text color="cyan" bold>
-				{' '}
-				Snake CLI 🐍{' '}
-			</Text>
+			<Header />
 
 			<Box marginY={1} flexDirection="row">
 				<Box marginRight={2}>

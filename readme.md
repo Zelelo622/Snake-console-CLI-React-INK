@@ -7,19 +7,3 @@
 ```bash
 $ npm install --global snake-cli
 ```
-
-## CLI
-
-```
-$ snake-cli --help
-
-  Usage
-    $ snake-cli
-
-  Options
-    --name  Your name
-
-  Examples
-    $ snake-cli --name=Jane
-    Hello, Jane
-```

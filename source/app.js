@@ -60,13 +60,20 @@ export default function App() {
 		x: 10,
 		y: 10,
 	});
-	const [head] = snakeSegments;
+	const [head, ...tail] = snakeSegments;
 
-	useInterval(() => {
-		setSnakeSegments(segments =>
-			newSnakePosition(segments, direction, foodItem),
-		);
-	}, 50);
+	const intersectsWithItself = tail.some(
+		segment => segment.x === head.x && segment.y === head.y,
+	);
+
+	useInterval(
+		() => {
+			setSnakeSegments(segments =>
+				newSnakePosition(segments, direction, foodItem),
+			);
+		},
+		intersectsWithItself ? null : 50,
+	);
 
 	useInput((input, key) => {
 		if (input === 'q') exit();
@@ -97,17 +104,21 @@ export default function App() {
 			<Text color="cyan" bold>
 				Snake CLI 🐍
 			</Text>
-			<Box flexDirection="column">
-				{FIELD_ROW.map(y => (
-					<Box key={y}>
-						{FIELD_ROW.map(x => (
-							<Text key={x}>
-								{getItem(x, y, snakeSegments, foodItem) || ' . '}
-							</Text>
-						))}
-					</Box>
-				))}
-			</Box>
+			{intersectsWithItself ? (
+				<Text color="red">Game Over</Text>
+			) : (
+				<Box flexDirection="column">
+					{FIELD_ROW.map(y => (
+						<Box key={y}>
+							{FIELD_ROW.map(x => (
+								<Text key={x}>
+									{getItem(x, y, snakeSegments, foodItem) || ' . '}
+								</Text>
+							))}
+						</Box>
+					))}
+				</Box>
+			)}
 		</Box>
 	);
 }

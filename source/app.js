@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, Box, useApp, useStdin, useInput} from 'ink';
+import {Text, Box, useApp, useInput} from 'ink';
 import {useInterval} from './hooks/useInterval.js';
 
 const FIELD_SIZE = 16;
@@ -11,6 +11,13 @@ const DIRECTIONS = {
 	TOP: {x: 0, y: -1},
 	BOTTOM: {x: 0, y: 1},
 };
+
+const INITIAL_SNAKE = [
+	{x: 8, y: 8},
+	{x: 8, y: 7},
+	{x: 8, y: 6},
+];
+const INITIAL_DIRECTION = DIRECTIONS.LEFT;
 
 function getItem(x, y, snakeSegments, foodItem) {
 	if (x === foodItem.x && y === foodItem.y) {
@@ -38,33 +45,29 @@ function newSnakePosition(segments, direction, foodItem) {
 }
 
 function limitByField(x) {
-	if (x >= FIELD_SIZE) {
-		return 0;
-	}
-	if (x < 0) {
-		return FIELD_SIZE - 1;
-	}
-
+	if (x >= FIELD_SIZE) return 0;
+	if (x < 0) return FIELD_SIZE - 1;
 	return x;
 }
 
 export default function App() {
 	const {exit} = useApp();
-	const [snakeSegments, setSnakeSegments] = useState([
-		{x: 8, y: 8},
-		{x: 8, y: 7},
-		{x: 8, y: 6},
-	]);
-	const [direction, setDirection] = useState(DIRECTIONS.LEFT);
-	const [foodItem, setFoodItem] = useState({
-		x: 10,
-		y: 10,
-	});
-	const [head, ...tail] = snakeSegments;
+	const [snakeSegments, setSnakeSegments] = useState(INITIAL_SNAKE);
+	const [direction, setDirection] = useState(INITIAL_DIRECTION);
+	const [foodItem, setFoodItem] = useState({x: 10, y: 10});
+	const [score, setScore] = useState(0);
 
+	const [head, ...tail] = snakeSegments;
 	const intersectsWithItself = tail.some(
 		segment => segment.x === head.x && segment.y === head.y,
 	);
+
+	const restartGame = () => {
+		setSnakeSegments(INITIAL_SNAKE);
+		setDirection(INITIAL_DIRECTION);
+		setFoodItem({x: 5, y: 5});
+		setScore(0);
+	};
 
 	useInterval(
 		() => {
@@ -72,40 +75,66 @@ export default function App() {
 				newSnakePosition(segments, direction, foodItem),
 			);
 		},
-		intersectsWithItself ? null : 50,
+		intersectsWithItself ? null : 100,
 	);
 
 	useInput((input, key) => {
 		if (input === 'q') exit();
+		if (input === 'r') restartGame();
 
-		if (key.upArrow && direction !== DIRECTIONS.BOTTOM) {
+		if (key.upArrow && direction !== DIRECTIONS.BOTTOM)
 			setDirection(DIRECTIONS.TOP);
-		}
-		if (key.downArrow && direction !== DIRECTIONS.TOP) {
+		if (key.downArrow && direction !== DIRECTIONS.TOP)
 			setDirection(DIRECTIONS.BOTTOM);
-		}
-		if (key.leftArrow && direction !== DIRECTIONS.RIGHT) {
+		if (key.leftArrow && direction !== DIRECTIONS.RIGHT)
 			setDirection(DIRECTIONS.LEFT);
-		}
-		if (key.rightArrow && direction !== DIRECTIONS.LEFT) {
+		if (key.rightArrow && direction !== DIRECTIONS.LEFT)
 			setDirection(DIRECTIONS.RIGHT);
-		}
-	}, []);
+	});
 
-	if (head.x === foodItem.x && head.y === foodItem.y) {
-		setFoodItem({
-			x: Math.round(Math.random() * FIELD_SIZE),
-			y: Math.round(Math.random() * FIELD_SIZE),
-		});
-	}
+	useEffect(() => {
+		if (head.x === foodItem.x && head.y === foodItem.y) {
+			setScore(prev => prev + 1);
+			setFoodItem({
+				x: Math.floor(Math.random() * FIELD_SIZE),
+				y: Math.floor(Math.random() * FIELD_SIZE),
+			});
+		}
+	}, [head, foodItem]);
 
 	return (
-		<Box flexDirection="column" alignItems="center">
+		<Box
+			flexDirection="column"
+			alignItems="center"
+			borderStyle="round"
+			borderColor="cyan"
+			paddingX={1}
+		>
 			<Text color="cyan" bold>
-				Snake CLI 🐍
+				{' '}
+				Snake CLI 🐍{' '}
 			</Text>
+
+			<Box marginY={1}>
+				<Text>Score: </Text>
+				<Text color="yellow" bold>
+					{score}
+				</Text>
+			</Box>
+
 			{intersectsWithItself ? (
-				<Text color="red">Game Over</Text>
+				<Box flexDirection="column" alignItems="center">
+					<Text color="red" bold>
+						💥 GAME OVER 💥
+					</Text>
+					<Text color="white">Final Score: {score}</Text>
+					<Box marginTop={1}>
+						<Text inverted color="yellow">
+							{' '}
+							Press 'r' to Restart{' '}
+						</Text>
+					</Box>
+				</Box>
 			) : (
 				<Box flexDirection="column">
 					{FIELD_ROW.map(y => (
@@ -119,6 +148,26 @@ export default function App() {
 					))}
 				</Box>
 			)}
+
+			<Box marginTop={1} flexDirection="column" alignItems="center">
+				<Text dimColor>----------------------------</Text>
+				<Text>
+					Use{' '}
+					<Text color="magenta" bold>
+						Arrow Keys
+					</Text>{' '}
+					to Move
+				</Text>
+				<Box>
+					<Text>
+						Press <Text color="red">q</Text> to Quit
+					</Text>
+					<Text> | </Text>
+					<Text>
+						Press <Text color="green">r</Text> to Reset
+					</Text>
+				</Box>
+			</Box>
 		</Box>
 	);
 }

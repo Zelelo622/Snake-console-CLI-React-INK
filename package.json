@@ -1,6 +1,6 @@
 {
 	"name": "@zelelo/snake-cli-game",
-	"version": "0.0.5",
+	"version": "0.1.0",
 	"license": "MIT",
 	"bin": {
 		"snake-cli-game": "./dist/cli.js"
@@ -11,11 +11,14 @@
 	},
 	"scripts": {
 		"build": "babel --out-dir=dist source",
+		"prepublishOnly": "npm run build",
 		"dev": "babel --out-dir=dist --watch source",
 		"test": "prettier --check . && xo && ava"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"LICENSE",
+		"readme.md"
 	],
 	"dependencies": {
 		"ink": "^4.1.0",

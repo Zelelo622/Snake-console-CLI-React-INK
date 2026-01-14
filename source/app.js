@@ -19,6 +19,23 @@ const INITIAL_SNAKE = [
 ];
 const INITIAL_DIRECTION = DIRECTIONS.LEFT;
 
+function generateFood(snakeSegments) {
+	let newFood;
+	let isCollision = true;
+
+	while (isCollision) {
+		newFood = {
+			x: Math.floor(Math.random() * FIELD_SIZE),
+			y: Math.floor(Math.random() * FIELD_SIZE),
+		};
+
+		isCollision = snakeSegments.some(
+			segment => segment.x === newFood.x && segment.y === newFood.y,
+		);
+	}
+	return newFood;
+}
+
 function getItem(x, y, snakeSegments, foodItem) {
 	if (x === foodItem.x && y === foodItem.y) {
 		return <Text>🍎 </Text>;
@@ -65,7 +82,7 @@ export default function App() {
 	const restartGame = () => {
 		setSnakeSegments(INITIAL_SNAKE);
 		setDirection(INITIAL_DIRECTION);
-		setFoodItem({x: 5, y: 5});
+		setFoodItem(generateFood(INITIAL_SNAKE));
 		setScore(0);
 	};
 
@@ -95,12 +112,9 @@ export default function App() {
 	useEffect(() => {
 		if (head.x === foodItem.x && head.y === foodItem.y) {
 			setScore(prev => prev + 1);
-			setFoodItem({
-				x: Math.floor(Math.random() * FIELD_SIZE),
-				y: Math.floor(Math.random() * FIELD_SIZE),
-			});
+			setFoodItem(generateFood(snakeSegments));
 		}
-	}, [head, foodItem]);
+	}, [head, foodItem, snakeSegments]);
 
 	return (
 		<Box

@@ -1,13 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {Text, Box, useApp, useInput} from 'ink';
+import {Text, Box, useApp, useInput, useStdout} from 'ink'; // Добавили useStdout
 import {useInterval} from './hooks/useInterval.js';
-import { Header } from './components/Header.js';
+import {Header} from './components/Header.js';
 
 const SLOW_SPEED = 150;
 const MIDDLE_SPEED = 110;
 const FAST_SPEED = 70;
 const FIELD_SIZE = 16;
 const FIELD_ROW = [...new Array(FIELD_SIZE).keys()];
+
+const MIN_COLUMNS = 45;
+const MIN_ROWS = 25;
 
 const DIRECTIONS = {
 	RIGHT: {x: 1, y: 0},
@@ -73,23 +76,41 @@ function limitByField(x) {
 
 const getSpeedLevel = currentDelay => {
 	if (currentDelay === SLOW_SPEED) return '1';
-	if (currentDelay  === MIDDLE_SPEED) return '2';
+	if (currentDelay === MIDDLE_SPEED) return '2';
 	return '3';
 };
 
 export default function App() {
 	const {exit} = useApp();
+	const {stdout} = useStdout();
+
+	const [isStarted, setIsStarted] = useState(false);
+	const [terminalTooSmall, setTerminalTooSmall] = useState(false);
+
 	const [snakeSegments, setSnakeSegments] = useState(INITIAL_SNAKE);
 	const [direction, setDirection] = useState(INITIAL_DIRECTION);
 	const [foodItem, setFoodItem] = useState({x: 10, y: 10});
 	const [score, setScore] = useState(0);
-
 	const [delay, setDelay] = useState(MIDDLE_SPEED);
 
 	const [head, ...tail] = snakeSegments;
 	const intersectsWithItself = tail.some(
 		segment => segment.x === head.x && segment.y === head.y,
 	);
+
+	useEffect(() => {
+		const checkSize = () => {
+			if (stdout.columns < MIN_COLUMNS || stdout.rows < MIN_ROWS) {
+				setTerminalTooSmall(true);
+			} else {
+				setTerminalTooSmall(false);
+			}
+		};
+
+		checkSize();
+		stdout.on('resize', checkSize);
+		return () => stdout.off('resize', checkSize);
+	}, [stdout]);
 
 	const restartGame = () => {
 		setSnakeSegments(INITIAL_SNAKE);
@@ -105,25 +126,33 @@ export default function App() {
 				newSnakePosition(segments, direction, foodItem),
 			);
 		},
-		intersectsWithItself ? null : delay,
+
+		isStarted && !intersectsWithItself && !terminalTooSmall ? delay : null,
 	);
 
 	useInput((input, key) => {
 		if (input === 'q') exit();
+
+		if (key.return && !isStarted && !terminalTooSmall) {
+			setIsStarted(true);
+		}
+
 		if (input === 'r') restartGame();
 
-		if (input === '1') setDelay(SLOW_SPEED);
-		if (input === '2') setDelay(MIDDLE_SPEED);
-		if (input === '3') setDelay(FAST_SPEED);
+		if (isStarted) {
+			if (input === '1') setDelay(SLOW_SPEED);
+			if (input === '2') setDelay(MIDDLE_SPEED);
+			if (input === '3') setDelay(FAST_SPEED);
 
-		if (key.upArrow && direction !== DIRECTIONS.BOTTOM)
-			setDirection(DIRECTIONS.TOP);
-		if (key.downArrow && direction !== DIRECTIONS.TOP)
-			setDirection(DIRECTIONS.BOTTOM);
-		if (key.leftArrow && direction !== DIRECTIONS.RIGHT)
-			setDirection(DIRECTIONS.LEFT);
-		if (key.rightArrow && direction !== DIRECTIONS.LEFT)
-			setDirection(DIRECTIONS.RIGHT);
+			if (key.upArrow && direction !== DIRECTIONS.BOTTOM)
+				setDirection(DIRECTIONS.TOP);
+			if (key.downArrow && direction !== DIRECTIONS.TOP)
+				setDirection(DIRECTIONS.BOTTOM);
+			if (key.leftArrow && direction !== DIRECTIONS.RIGHT)
+				setDirection(DIRECTIONS.LEFT);
+			if (key.rightArrow && direction !== DIRECTIONS.LEFT)
+				setDirection(DIRECTIONS.RIGHT);
+		}
 	});
 
 	useEffect(() => {
@@ -133,6 +162,56 @@ export default function App() {
 		}
 	}, [head, foodItem, snakeSegments]);
 
+	if (terminalTooSmall) {
+		return (
+			<Box
+				flexDirection="column"
+				padding={1}
+				borderStyle="single"
+				borderColor="red"
+			>
+				<Text color="red" bold>
+					❗ Screen too small
+				</Text>
+				<Text>
+					Please resize your terminal to at least {MIN_COLUMNS}x{MIN_ROWS}.
+				</Text>
+				<Text dimColor>
+					Current: {stdout.columns}x{stdout.rows}
+				</Text>
+				<Text marginTop={1}>Press 'q' to quit.</Text>
+			</Box>
+		);
+	}
+
+	if (!isStarted) {
+		return (
+			<Box
+				flexDirection="column"
+				alignItems="center"
+				borderStyle="round"
+				borderColor="cyan"
+				padding={1}
+			>
+				<Header />
+				<Box marginTop={1} flexDirection="column" alignItems="center">
+					<Text bold color="yellow">
+						Welcome to Snake!
+					</Text>
+					<Box marginTop={1}>
+						<Text inverted color="green">
+							{' '}
+							PRESS ENTER TO START{' '}
+						</Text>
+					</Box>
+					<Box marginTop={1}>
+						<Text dimColor>Use Arrow Keys to move after start</Text>
+					</Box>
+				</Box>
+			</Box>
+		);
+	}
+
 	return (
 		<Box
 			flexDirection="column"
@@ -141,8 +220,6 @@ export default function App() {
 			borderColor="cyan"
 			paddingX={1}
 		>
-			<Header />
-
 			<Box marginY={1} flexDirection="row">
 				<Box marginRight={2}>
 					<Text>Score: </Text>
@@ -188,9 +265,8 @@ export default function App() {
 			<Box marginTop={1} flexDirection="column" alignItems="center">
 				<Text dimColor>----------------------------</Text>
 				<Text>
-					{' '}
 					Speed: <Text color="blue">1</Text>-Slow | <Text color="blue">2</Text>
-					-Mid | <Text color="blue">3</Text>-Fast{' '}
+					-Mid | <Text color="blue">3</Text>-Fast
 				</Text>
 				<Text>
 					Use{' '}

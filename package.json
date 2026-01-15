@@ -1,6 +1,6 @@
 {
 	"name": "@zelelo/snake-cli-game",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"private": false,
 	"license": "MIT",
 	"bin": {

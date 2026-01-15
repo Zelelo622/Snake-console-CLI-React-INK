@@ -13,6 +13,14 @@
 	"publishConfig": {
 		"access": "public"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Zelelo622/Snake-console-CLI-React-INK.git"
+	},
+	"homepage": "https://github.com/Zelelo622/Snake-console-CLI-React-INK",
+	"bugs": {
+		"url": "https://github.com/Zelelo622/Snake-console-CLI-React-INK/issues"
+	},
 	"scripts": {
 		"build": "babel --out-dir=dist source",
 		"prepublishOnly": "npm run build",

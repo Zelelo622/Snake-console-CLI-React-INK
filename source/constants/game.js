@@ -2,6 +2,8 @@ export const SLOW_SPEED = 150;
 export const MIDDLE_SPEED = 110;
 export const FAST_SPEED = 70;
 
+export const START_POINTS = 5;
+
 export const FIELD_SIZE = 16;
 export const FIELD_ROW = [...new Array(FIELD_SIZE).keys()];
 

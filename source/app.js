@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Box, useApp, useInput} from 'ink';
 
 import {
@@ -31,6 +31,7 @@ export default function App() {
 	const [isStarted, setIsStarted] = useState(false);
 	const [snakeSegments, setSnakeSegments] = useState(INITIAL_SNAKE);
 	const [direction, setDirection] = useState(INITIAL_DIRECTION);
+	const directionQueue = useRef([]);
 	const [foodItem, setFoodItem] = useState({x: 10, y: 10});
 	const [score, setScore] = useState(0);
 	const [delay, setDelay] = useState(MIDDLE_SPEED);
@@ -48,10 +49,20 @@ export default function App() {
 
 	useInterval(
 		() => {
+			if (directionQueue.current.length > 0) {
+				setDirection(directionQueue.current.shift());
+			}
+
 			setSnakeSegments(s => newSnakePosition(s, direction, foodItem));
 		},
 		isStarted && !intersects && !terminalTooSmall ? delay : null,
 	);
+
+	const isOpposite = (a, b) =>
+		(a === DIRECTIONS.TOP && b === DIRECTIONS.BOTTOM) ||
+		(a === DIRECTIONS.BOTTOM && b === DIRECTIONS.TOP) ||
+		(a === DIRECTIONS.LEFT && b === DIRECTIONS.RIGHT) ||
+		(a === DIRECTIONS.RIGHT && b === DIRECTIONS.LEFT);
 
 	useInput((input, key) => {
 		if (input === 'q') exit();
@@ -64,14 +75,20 @@ export default function App() {
 		if (input === '2') setDelay(MIDDLE_SPEED);
 		if (input === '3') setDelay(FAST_SPEED);
 
-		if (key.upArrow && direction !== DIRECTIONS.BOTTOM)
-			setDirection(DIRECTIONS.TOP);
-		if (key.downArrow && direction !== DIRECTIONS.TOP)
-			setDirection(DIRECTIONS.BOTTOM);
-		if (key.leftArrow && direction !== DIRECTIONS.RIGHT)
-			setDirection(DIRECTIONS.LEFT);
-		if (key.rightArrow && direction !== DIRECTIONS.LEFT)
-			setDirection(DIRECTIONS.RIGHT);
+		let next = null;
+
+		if (key.upArrow) next = DIRECTIONS.TOP;
+		if (key.downArrow) next = DIRECTIONS.BOTTOM;
+		if (key.leftArrow) next = DIRECTIONS.LEFT;
+		if (key.rightArrow) next = DIRECTIONS.RIGHT;
+
+		if (!next) return;
+
+		const last = directionQueue.current.at(-1) ?? direction;
+
+		if (!isOpposite(last, next)) {
+			directionQueue.current.push(next);
+		}
 	});
 
 	useEffect(() => {

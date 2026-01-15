@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useStdout} from 'ink';
+
 import {MIN_COLUMNS, MIN_ROWS} from '../constants/game.js';
 
 export function useTerminalSize() {

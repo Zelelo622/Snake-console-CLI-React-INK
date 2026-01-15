@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Text, useApp, useInput} from 'ink';
+import {Box, useApp, useInput} from 'ink';
 
 import {
 	SLOW_SPEED,
@@ -8,8 +8,6 @@ import {
 	DIRECTIONS,
 	INITIAL_SNAKE,
 	INITIAL_DIRECTION,
-	MIN_COLUMNS,
-	MIN_ROWS,
 } from './constants/game.js';
 
 import {useInterval} from './hooks/useInterval.js';

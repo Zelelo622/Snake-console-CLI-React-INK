@@ -6,7 +6,7 @@ This is a reactive CLI application built with **React** and **Ink**. It allows y
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Global Installation (Recommended)
 

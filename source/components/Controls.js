@@ -28,6 +28,15 @@ export function Controls() {
 					Press <Text color="green">r</Text> to Reset
 				</Text>
 			</Box>
+			<Box>
+				<Text>
+					Press <Text color="cyan">p</Text> to Pause
+				</Text>
+				<Text> | </Text>
+				<Text>
+					Press <Text color="grey">m</Text> Return to Menu
+				</Text>
+			</Box>
 		</Box>
 	);
 }

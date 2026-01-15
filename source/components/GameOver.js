@@ -15,12 +15,13 @@ export function GameOver({score, highScore}) {
 			)}
 			<Box flexDirection="column" alignItems="center" marginTop={1}>
 				<Text inverted color="yellow">
-					{' '}
-					Press 'r' to Restart{' '}
+					Press 'r' to Restart
 				</Text>
 				<Text>
-					{' '}
-					Press <Text color="red">q</Text> to Quit{' '}
+					Press <Text color="magenta">m</Text> Return to Menu
+				</Text>
+				<Text>
+					Press <Text color="red">q</Text> to Quit
 				</Text>
 			</Box>
 		</Box>

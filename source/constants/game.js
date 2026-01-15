@@ -24,3 +24,39 @@ export const INITIAL_SNAKE = [
 ];
 
 export const INITIAL_DIRECTION = DIRECTIONS.LEFT;
+
+export const SKINS = [
+	{
+		id: 'classic',
+		name: 'Classic',
+		head: 'yellow',
+		body: 'green',
+		headChar: ' ◼ ',
+		bodyChar: ' ◼ ',
+		foodChar: '🍎 ',
+		specialChar: '⭐ ',
+		requirement: 0,
+	},
+	{
+		id: 'skeleton',
+		name: 'Skeleton',
+		head: 'red',
+		body: 'grey',
+		headChar: '💀 ',
+		bodyChar: '🔷 ',
+		foodChar: '🥩 ',
+		specialChar: '🩸 ',
+		requirement: 25,
+	},
+	{
+		id: 'brainy',
+		name: 'Brainy',
+		head: 'white',
+		body: 'gray',
+		headChar: '🧠 ',
+		bodyChar: '🔶 ',
+		foodChar: '📚 ',
+		specialChar: '💡 ',
+		requirement: 50,
+	},
+];

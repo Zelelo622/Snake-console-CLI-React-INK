@@ -9,6 +9,7 @@ import {
 	INITIAL_SNAKE,
 	INITIAL_DIRECTION,
 	START_POINTS,
+	SKINS,
 } from './constants/game.js';
 
 import {useInterval} from './hooks/useInterval.js';
@@ -38,6 +39,8 @@ export default function App() {
 	const [delay, setDelay] = useState(MIDDLE_SPEED);
 	const [starItem, setStarItem] = useState(null);
 	const [highScore, setHighScore] = useState(0);
+	const [selectedSkinIndex, setSelectedSkinIndex] = useState(0);
+	const [isPaused, setIsPaused] = useState(false);
 
 	const snakeRef = useRef(snakeSegments);
 	const directionQueue = useRef([]);
@@ -51,7 +54,13 @@ export default function App() {
 		setDirection(INITIAL_DIRECTION);
 		setFoodItem(generateFood(INITIAL_SNAKE));
 		setScore(0);
+		setIsPaused(false);
 		setDelay(MIDDLE_SPEED);
+	};
+
+	const backToMenu = () => {
+		setIsStarted(false);
+		restartGame();
 	};
 
 	useInterval(
@@ -62,7 +71,7 @@ export default function App() {
 
 			setSnakeSegments(s => newSnakePosition(s, direction, foodItem));
 		},
-		isStarted && !intersects && !terminalTooSmall ? delay : null,
+		isStarted && !intersects && !isPaused && !terminalTooSmall ? delay : null,
 	);
 
 	const isOpposite = (a, b) =>
@@ -73,10 +82,29 @@ export default function App() {
 
 	useInput((input, key) => {
 		if (input === 'q') exit();
+
+		if (!isStarted) {
+			if (input === 's' || key.rightArrow) {
+				setSelectedSkinIndex(prev => (prev + 1) % SKINS.length);
+			}
+			if (key.leftArrow) {
+				setSelectedSkinIndex(prev => (prev - 1 + SKINS.length) % SKINS.length);
+			}
+
+			if (key.return) {
+				if (highScore >= SKINS[selectedSkinIndex].requirement) {
+					setIsStarted(true);
+				}
+			}
+			return;
+		}
+
 		if (key.return && !isStarted) setIsStarted(true);
 		if (input === 'r') restartGame();
+		if (input === 'p') setIsPaused(prev => !prev);
+        if (input === 'm') backToMenu();
 
-		if (!isStarted) return;
+        if (isPaused || intersects) return;
 
 		if (input === '1') setDelay(SLOW_SPEED);
 		if (input === '2') setDelay(MIDDLE_SPEED);
@@ -153,7 +181,13 @@ export default function App() {
 	}
 
 	if (!isStarted) {
-		return <StartScreen />;
+		return (
+			<StartScreen
+				highScore={highScore}
+				selectedSkinIndex={selectedSkinIndex}
+				skins={SKINS}
+			/>
+		);
 	}
 
 	return (
@@ -172,6 +206,7 @@ export default function App() {
 					snakeSegments={snakeSegments}
 					foodItem={foodItem}
 					starItem={starItem}
+					skin={SKINS[selectedSkinIndex]}
 				/>
 			)}
 

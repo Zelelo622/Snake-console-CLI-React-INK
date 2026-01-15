@@ -8,6 +8,7 @@ import {
 	DIRECTIONS,
 	INITIAL_SNAKE,
 	INITIAL_DIRECTION,
+	START_POINTS,
 } from './constants/game.js';
 
 import {useInterval} from './hooks/useInterval.js';
@@ -23,6 +24,7 @@ import {GameOver} from './components/GameOver.js';
 import {StartScreen} from './components/StartScreen.js';
 import {Controls} from './components/Controls.js';
 import {ScreenError} from './components/ScreenError.js';
+import {getHighScore, saveHighScore} from './logic/highscore.js';
 
 export default function App() {
 	const {exit} = useApp();
@@ -31,10 +33,15 @@ export default function App() {
 	const [isStarted, setIsStarted] = useState(false);
 	const [snakeSegments, setSnakeSegments] = useState(INITIAL_SNAKE);
 	const [direction, setDirection] = useState(INITIAL_DIRECTION);
-	const directionQueue = useRef([]);
 	const [foodItem, setFoodItem] = useState({x: 10, y: 10});
 	const [score, setScore] = useState(0);
 	const [delay, setDelay] = useState(MIDDLE_SPEED);
+	const [starItem, setStarItem] = useState(null);
+	const [highScore, setHighScore] = useState(0);
+
+	const snakeRef = useRef(snakeSegments);
+	const directionQueue = useRef([]);
+	const isSaved = useRef(false);
 
 	const [head, ...tail] = snakeSegments;
 	const intersects = tail.some(s => s.x === head.x && s.y === head.y);
@@ -92,11 +99,54 @@ export default function App() {
 	});
 
 	useEffect(() => {
+		setHighScore(getHighScore());
+	}, []);
+
+	useEffect(() => {
+		if (intersects && !isSaved.current) {
+			console.log('message');
+			const isNewRecord = saveHighScore(score);
+			if (isNewRecord) {
+				setHighScore(score);
+			}
+			isSaved.current = true;
+		}
+
+		if (!intersects) {
+			isSaved.current = false;
+		}
+	}, [intersects, score]);
+
+	useEffect(() => {
+		snakeRef.current = snakeSegments;
+	}, [snakeSegments]);
+
+	useEffect(() => {
+		if (!isStarted || intersects) return;
+
+		const spawnStar = () => {
+			const newStar = generateFood(snakeRef.current);
+			setStarItem(newStar);
+
+			setTimeout(() => setStarItem(null), 6_000);
+		};
+
+		const starInterval = setInterval(spawnStar, 30_000);
+
+		return () => clearInterval(starInterval);
+	}, [isStarted, intersects]);
+
+	useEffect(() => {
 		if (head.x === foodItem.x && head.y === foodItem.y) {
 			setScore(s => s + 1);
 			setFoodItem(generateFood(snakeSegments));
 		}
-	}, [head, foodItem, snakeSegments]);
+
+		if (starItem && head.x === starItem.x && head.y === starItem.y) {
+			setScore(s => s + START_POINTS);
+			setStarItem(null);
+		}
+	}, [head, foodItem, starItem, snakeSegments]);
 
 	if (terminalTooSmall) {
 		return <ScreenError stdout={stdout} />;
@@ -109,12 +159,20 @@ export default function App() {
 	return (
 		<Box flexDirection="column" alignItems="center">
 			{!intersects && (
-				<GameInfo score={score} speedLevel={getSpeedLevel(delay)} />
+				<GameInfo
+					score={score}
+					highScore={highScore}
+					speedLevel={getSpeedLevel(delay)}
+				/>
 			)}
 			{intersects ? (
-				<GameOver score={score} />
+				<GameOver score={score} highScore={highScore} />
 			) : (
-				<GameBoard snakeSegments={snakeSegments} foodItem={foodItem} />
+				<GameBoard
+					snakeSegments={snakeSegments}
+					foodItem={foodItem}
+					starItem={starItem}
+				/>
 			)}
 
 			{!intersects && <Controls />}

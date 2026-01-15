@@ -12,9 +12,11 @@ export function GameBoard({snakeSegments, foodItem, starItem}) {
 			return <Text>⭐</Text>
 		}
 
+		const head = snakeSegments[0];
 		for (const segment of snakeSegments) {
+			const isHead = head === segment;
 			if (segment.x === x && segment.y === y) {
-				return <Text color="green"> ◼ </Text>;
+				return <Text color={isHead ? "yellow" : "green"}> ◼ </Text>;
 			}
 		}
 

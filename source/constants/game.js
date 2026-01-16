@@ -34,7 +34,7 @@ export const SKINS = [
 		headChar: ' ◼ ',
 		bodyChar: ' ◼ ',
 		foodChar: '🍎 ',
-		specialChar: '⭐ ',
+		specialChar: '🍍 ',
 		requirement: 0,
 	},
 	{

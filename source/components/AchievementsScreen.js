@@ -3,7 +3,6 @@ import React, {useState} from 'react';
 
 const AchievementsScreen = ({achievements, earnedIds, onBack}) => {
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const visibleCount = 5;
 
 	useInput((input, key) => {
 		if (key.upArrow) {

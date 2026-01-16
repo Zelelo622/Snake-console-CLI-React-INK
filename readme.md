@@ -8,7 +8,7 @@ This is a reactive CLI application built with **React** and **Ink**. It allows y
 
 ## Installation
 
-### Global Installation (Recommended)
+### Global Installation
 
 Install it globally to have the game available as a command anywhere in your system:
 
@@ -22,7 +22,7 @@ npm install --global @zelelo/snake-cli-game
 snake-cli-game
 ```
 
-### Quick Run (Without Installation)
+### Quick Run
 
 Try it instantly without installing it to your system:
 

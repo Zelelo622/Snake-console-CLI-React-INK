@@ -3,7 +3,7 @@ import {Box, Text} from 'ink';
 
 export function GameOver({score, highScore}) {
 	return (
-		<Box flexDirection="column" alignItems="center">
+		<Box marginY={1} flexDirection="column" alignItems="center">
 			<Text color="red" bold>
 				💥 GAME OVER 💥
 			</Text>

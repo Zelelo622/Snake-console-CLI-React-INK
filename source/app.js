@@ -16,7 +16,7 @@ import {useInterval} from './hooks/useInterval.js';
 import {useTerminalSize} from './hooks/useTerminalSize.js';
 
 import {generateFood} from './logic/food.js';
-import {newSnakePosition} from './logic/snake.js';
+import {cutSnake, newSnakePosition} from './logic/snake.js';
 import {getSpeedLevel} from './logic/speed.js';
 
 import {GameBoard} from './components/GameBoard.js';
@@ -26,6 +26,7 @@ import {StartScreen} from './components/StartScreen.js';
 import {Controls} from './components/Controls.js';
 import {ScreenError} from './components/ScreenError.js';
 import {getHighScore, saveHighScore} from './logic/highscore.js';
+import {isItemEaten} from './logic/items.js';
 
 export default function App() {
 	const {exit} = useApp();
@@ -41,6 +42,8 @@ export default function App() {
 	const [highScore, setHighScore] = useState(0);
 	const [selectedSkinIndex, setSelectedSkinIndex] = useState(0);
 	const [isPaused, setIsPaused] = useState(false);
+	const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+	const [scissorsItem, setScissorsItem] = useState(null);
 
 	const snakeRef = useRef(snakeSegments);
 	const directionQueue = useRef([]);
@@ -84,6 +87,9 @@ export default function App() {
 		if (input === 'q') exit();
 
 		if (!isStarted) {
+			if (input === 'a') {
+				setIsAdvancedMode(prev => !prev);
+			}
 			if (input === 's' || key.rightArrow) {
 				setSelectedSkinIndex(prev => (prev + 1) % SKINS.length);
 			}
@@ -102,9 +108,9 @@ export default function App() {
 		if (key.return && !isStarted) setIsStarted(true);
 		if (input === 'r') restartGame();
 		if (input === 'p') setIsPaused(prev => !prev);
-        if (input === 'm') backToMenu();
+		if (input === 'm') backToMenu();
 
-        if (isPaused || intersects) return;
+		if (isPaused || intersects) return;
 
 		if (input === '1') setDelay(SLOW_SPEED);
 		if (input === '2') setDelay(MIDDLE_SPEED);
@@ -132,7 +138,6 @@ export default function App() {
 
 	useEffect(() => {
 		if (intersects && !isSaved.current) {
-			console.log('message');
 			const isNewRecord = saveHighScore(score);
 			if (isNewRecord) {
 				setHighScore(score);
@@ -153,28 +158,42 @@ export default function App() {
 		if (!isStarted || intersects) return;
 
 		const spawnStar = () => {
-			const newStar = generateFood(snakeRef.current);
-			setStarItem(newStar);
-
+			setStarItem(generateFood(snakeRef.current));
 			setTimeout(() => setStarItem(null), 6_000);
 		};
 
-		const starInterval = setInterval(spawnStar, 30_000);
+		const spawnScissors = () => {
+			if (isAdvancedMode) {
+				setScissorsItem(generateFood(snakeRef.current));
+				setTimeout(() => setScissorsItem(null), 8_000);
+			}
+		};
 
-		return () => clearInterval(starInterval);
-	}, [isStarted, intersects]);
+		const starInterval = setInterval(spawnStar, 30_000);
+		const scissorsInterval = setInterval(spawnScissors, 60_000);
+
+		return () => {
+			clearInterval(starInterval);
+			clearInterval(scissorsInterval);
+		};
+	}, [isStarted, intersects, isAdvancedMode]);
 
 	useEffect(() => {
-		if (head.x === foodItem.x && head.y === foodItem.y) {
+		if (isItemEaten(head, foodItem)) {
 			setScore(s => s + 1);
 			setFoodItem(generateFood(snakeSegments));
 		}
 
-		if (starItem && head.x === starItem.x && head.y === starItem.y) {
+		if (isItemEaten(head, starItem)) {
 			setScore(s => s + START_POINTS);
 			setStarItem(null);
 		}
-	}, [head, foodItem, starItem, snakeSegments]);
+
+		if (isAdvancedMode && isItemEaten(head, scissorsItem)) {
+			setSnakeSegments(prev => cutSnake(prev));
+			setScissorsItem(null);
+		}
+	}, [head, foodItem, starItem, scissorsItem, snakeSegments, isAdvancedMode]);
 
 	if (terminalTooSmall) {
 		return <ScreenError stdout={stdout} />;
@@ -186,6 +205,7 @@ export default function App() {
 				highScore={highScore}
 				selectedSkinIndex={selectedSkinIndex}
 				skins={SKINS}
+				isAdvancedMode={isAdvancedMode}
 			/>
 		);
 	}
@@ -206,6 +226,7 @@ export default function App() {
 					snakeSegments={snakeSegments}
 					foodItem={foodItem}
 					starItem={starItem}
+					scissorsItem={scissorsItem}
 					skin={SKINS[selectedSkinIndex]}
 				/>
 			)}

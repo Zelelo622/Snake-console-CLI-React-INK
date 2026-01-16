@@ -2,7 +2,13 @@ import React from 'react';
 import {Box, Text} from 'ink';
 import {FIELD_ROW} from '../constants/game.js';
 
-export function GameBoard({snakeSegments, foodItem, starItem, skin}) {
+export function GameBoard({
+	snakeSegments,
+	foodItem,
+	starItem,
+	scissorsItem,
+	skin,
+}) {
 	const getItem = (x, y) => {
 		if (x === foodItem.x && y === foodItem.y) {
 			return <Text>{skin.foodChar}</Text>;
@@ -11,15 +17,16 @@ export function GameBoard({snakeSegments, foodItem, starItem, skin}) {
 			return <Text>{skin.specialChar}</Text>;
 		}
 
-		const head = snakeSegments[0];
+		if (scissorsItem && x === scissorsItem.x && y === scissorsItem.y) {
+			return <Text>✂️ </Text>;
+		}
 
+		const head = snakeSegments[0];
 		for (const segment of snakeSegments) {
 			if (segment.x === x && segment.y === y) {
 				const isHead = segment === head;
-
 				const char = isHead ? skin.headChar : skin.bodyChar;
 				const color = isHead ? skin.head : skin.body;
-
 				return <Text color={color}>{`${char}`}</Text>;
 			}
 		}

@@ -20,3 +20,7 @@ export function newSnakePosition(segments, direction, foodItem) {
 
 	return [newHead, ...segments.slice(0, -1)];
 }
+
+export function cutSnake(segments) {
+	return segments.length > 3 ? segments.slice(0, 3) : segments;
+}

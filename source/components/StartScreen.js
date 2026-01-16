@@ -2,7 +2,12 @@ import React from 'react';
 import {Box, Text} from 'ink';
 import {Header} from './Header.js';
 
-export function StartScreen({highScore, selectedSkinIndex, skins}) {
+export function StartScreen({
+	highScore,
+	selectedSkinIndex,
+	skins,
+	isAdvancedMode,
+}) {
 	return (
 		<Box flexDirection="column" alignItems="center" padding={1}>
 			<Header />
@@ -10,6 +15,7 @@ export function StartScreen({highScore, selectedSkinIndex, skins}) {
 				Welcome to Snake!
 			</Text>
 
+			{/* Блок выбора скинов */}
 			<Box marginTop={1} flexDirection="column" alignItems="center">
 				<Text color="magenta">── SELECT YOUR SKIN ──</Text>
 				<Box marginTop={1}>
@@ -42,6 +48,19 @@ export function StartScreen({highScore, selectedSkinIndex, skins}) {
 				<Text dimColor marginTop={1}>
 					Use 'S' or Arrow Keys to cycle skins
 				</Text>
+			</Box>
+
+			<Box marginTop={1} flexDirection="column" alignItems="center">
+				<Box
+					paddingX={1}
+					borderStyle="round"
+					borderColor={isAdvancedMode ? 'green' : 'gray'}
+				>
+					<Text color={isAdvancedMode ? 'green' : 'white'}>
+						{isAdvancedMode ? '[X]' : '[ ]'} ADVANCED MODE (Bonuses, Portals)
+					</Text>
+				</Box>
+				<Text dimColor>Press 'A' to toggle game mode</Text>
 			</Box>
 
 			<Box marginTop={1}>

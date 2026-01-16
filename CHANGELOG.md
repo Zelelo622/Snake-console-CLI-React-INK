@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/Zelelo622/Snake-console-CLI-React-INK/compare/v2.5.0...v3.0.0) (2026-01-16)
+
+
+### Features
+
+* add Fog of War and Ghost mechanics ([54fa0b7](https://github.com/Zelelo622/Snake-console-CLI-React-INK/commit/54fa0b7a228baa9c028a3b016ad88f99dec6505d))
+
+
+### BREAKING CHANGES
+
+* major gameplay update with new advanced mode effects and ghost transformation logic
+
 # [2.5.0](https://github.com/Zelelo622/Snake-console-CLI-React-INK/compare/v2.4.0...v2.5.0) (2026-01-16)
 
 

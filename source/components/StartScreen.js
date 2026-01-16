@@ -11,6 +11,7 @@ export function StartScreen({
 	return (
 		<Box flexDirection="column" alignItems="center" padding={1}>
 			<Header />
+
 			<Text bold color="yellow">
 				Welcome to Snake!
 			</Text>
@@ -68,6 +69,12 @@ export function StartScreen({
 					{' '}
 					PRESS ENTER TO START{' '}
 				</Text>
+			</Box>
+
+			<Box flexDirection="column" alignItems="center">
+				<Box paddingX={1} borderStyle="round" borderColor="magenta">
+					<Text color="magenta">🏆 PRESS 'V' TO VIEW ACHIEVEMENTS</Text>
+				</Box>
 			</Box>
 		</Box>
 	);

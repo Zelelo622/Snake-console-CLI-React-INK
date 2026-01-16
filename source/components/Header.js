@@ -1,4 +1,5 @@
 import React, {memo} from 'react';
+import pkg from '../../package.json' with { type: 'json' };
 import {Box, Text} from 'ink';
 import BigText from 'ink-big-text';
 import Gradient from 'ink-gradient';
@@ -12,8 +13,9 @@ export const Header = memo(() => (
 		<Box marginTop={-1}>
 			<Text backgroundColor="cyan" color="black" bold>
 				{' '}
-				CLI EDITION v2.0{' '}
+				CLI EDITION v{pkg.version}{' '}
 			</Text>
 		</Box>
 	</Box>
 ));
+ 

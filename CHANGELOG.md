@@ -1,3 +1,11 @@
+# [2.5.0](https://github.com/Zelelo622/Snake-console-CLI-React-INK/compare/v2.4.0...v2.5.0) (2026-01-16)
+
+
+### Features
+
+* added fog effect in advaned mode ([5500b08](https://github.com/Zelelo622/Snake-console-CLI-React-INK/commit/5500b08d1587b5d96b68007269171a3e1b631e8d))
+* added ghost item for advanced mode ([d9722bd](https://github.com/Zelelo622/Snake-console-CLI-React-INK/commit/d9722bd9f06d6464d01d7a1a3a50167e20f2123f))
+
 # [2.4.0](https://github.com/Zelelo622/Snake-console-CLI-React-INK/compare/v2.3.0...v2.4.0) (2026-01-16)
 
 

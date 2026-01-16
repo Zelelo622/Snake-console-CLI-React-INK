@@ -8,20 +8,30 @@ export function GameBoard({
 	starItem,
 	scissorsItem,
 	skin,
+	isFogActive,
 }) {
+	const head = snakeSegments[0];
+
 	const getItem = (x, y) => {
+		if (isFogActive) {
+			const distanceX = Math.abs(x - head.x);
+			const distanceY = Math.abs(y - head.y);
+
+			if (distanceX > 2 || distanceY > 2) {
+				return '   ';
+			}
+		}
+
 		if (x === foodItem.x && y === foodItem.y) {
 			return <Text>{skin.foodChar}</Text>;
 		}
 		if (starItem && x === starItem.x && y === starItem.y) {
 			return <Text>{skin.specialChar}</Text>;
 		}
-
 		if (scissorsItem && x === scissorsItem.x && y === scissorsItem.y) {
 			return <Text>✂️ </Text>;
 		}
 
-		const head = snakeSegments[0];
 		for (const segment of snakeSegments) {
 			if (segment.x === x && segment.y === y) {
 				const isHead = segment === head;
@@ -35,7 +45,11 @@ export function GameBoard({
 	};
 
 	return (
-		<Box flexDirection="column">
+		<Box
+			flexDirection="column"
+			borderStyle="round"
+			borderColor={isFogActive ? 'gray' : 'white'}
+		>
 			{FIELD_ROW.map(y => (
 				<Box key={y}>
 					{FIELD_ROW.map(x => (

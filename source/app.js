@@ -53,6 +53,8 @@ export default function App() {
 	const [selectedSkinIndex, setSelectedSkinIndex] = useState(0);
 	const [isPaused, setIsPaused] = useState(false);
 
+	const [isFogActive, setIsFogActive] = useState(false);
+
 	// Достижения и Статистика
 	const [earnedAchievements, setEarnedAchievements] = useState([]);
 	const [activeAchievement, setActiveAchievement] = useState(null);
@@ -188,6 +190,16 @@ export default function App() {
 	useEffect(() => {
 		if (currentScreen !== 'GAME' || intersects) return;
 
+		const fogInt = setInterval(() => {
+			if (isAdvancedMode) {
+				setIsFogActive(true);
+
+				setTimeout(() => {
+					setIsFogActive(false);
+				}, 6000);
+			}
+		}, 300000);
+
 		const starInt = setInterval(() => {
 			setStarItem(generateFood(snakeRef.current));
 			setTimeout(() => setStarItem(null), 6000);
@@ -201,6 +213,7 @@ export default function App() {
 		}, 45000);
 
 		return () => {
+			clearInterval(fogInt);
 			clearInterval(starInt);
 			clearInterval(scissInt);
 		};
@@ -286,6 +299,7 @@ export default function App() {
 					starItem={starItem}
 					scissorsItem={scissorsItem}
 					skin={SKINS[selectedSkinIndex]}
+					isFogActive={isFogActive}
 				/>
 			)}
 

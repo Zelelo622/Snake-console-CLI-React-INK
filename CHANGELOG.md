@@ -1,3 +1,15 @@
+# [2.4.0](https://github.com/Zelelo622/Snake-console-CLI-React-INK/compare/v2.3.0...v2.4.0) (2026-01-16)
+
+
+### Bug Fixes
+
+* update bonus food for classic sckin ([9d174dc](https://github.com/Zelelo622/Snake-console-CLI-React-INK/commit/9d174dc881146f97d61a0cbd3344d6f729a9523f))
+
+
+### Features
+
+* added a bonus game mode. New item scissors ([3e816a5](https://github.com/Zelelo622/Snake-console-CLI-React-INK/commit/3e816a5880c98ce07dff4e9626500544fd6c7556))
+
 ## [2.0.1](https://github.com/Zelelo622/Snake-console-CLI-React-INK/compare/v2.0.0...v2.0.1) (2026-01-15)
 
 

@@ -41,7 +41,7 @@ export const SKINS = [
 		id: 'skeleton',
 		name: 'Skeleton',
 		head: 'red',
-		body: 'grey',
+		body: 'gray',
 		headChar: '💀 ',
 		bodyChar: '🔷 ',
 		foodChar: '🥩 ',

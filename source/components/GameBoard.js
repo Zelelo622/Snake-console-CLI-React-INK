@@ -9,6 +9,8 @@ export function GameBoard({
 	scissorsItem,
 	skin,
 	isFogActive,
+	isGhostActive,
+	ghostItem,
 }) {
 	const head = snakeSegments[0];
 
@@ -31,13 +33,33 @@ export function GameBoard({
 		if (scissorsItem && x === scissorsItem.x && y === scissorsItem.y) {
 			return <Text>✂️ </Text>;
 		}
+		if (ghostItem && x === ghostItem.x && y === ghostItem.y) {
+			return <Text>👻 </Text>;
+		}
 
 		for (const segment of snakeSegments) {
 			if (segment.x === x && segment.y === y) {
 				const isHead = segment === head;
-				const char = isHead ? skin.headChar : skin.bodyChar;
-				const color = isHead ? skin.head : skin.body;
-				return <Text color={color}>{`${char}`}</Text>;
+				let char;
+				if (isGhostActive) {
+					char = isHead ? '👻 ' : '░░ ';
+				} else {
+					char = isHead ? skin.headChar : skin.bodyChar;
+				}
+
+				const color = isGhostActive
+					? isHead
+						? 'white'
+						: 'gray'
+					: isHead
+					? skin.head
+					: skin.body;
+
+				return (
+					<Text key={`${x}-${y}`} color={color}>
+						{char}
+					</Text>
+				);
 			}
 		}
 
@@ -48,7 +70,7 @@ export function GameBoard({
 		<Box
 			flexDirection="column"
 			borderStyle="round"
-			borderColor={isFogActive ? 'gray' : 'white'}
+			borderColor={isGhostActive ? 'white' : isFogActive ? 'gray' : 'white'}
 		>
 			{FIELD_ROW.map(y => (
 				<Box key={y}>

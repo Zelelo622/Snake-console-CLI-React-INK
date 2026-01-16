@@ -54,6 +54,7 @@ export default function App() {
 	const [isPaused, setIsPaused] = useState(false);
 
 	const [isFogActive, setIsFogActive] = useState(false);
+	const [isGhostActive, setIsGhostActive] = useState(false);
 
 	// Достижения и Статистика
 	const [earnedAchievements, setEarnedAchievements] = useState([]);
@@ -67,13 +68,15 @@ export default function App() {
 	const [foodItem, setFoodItem] = useState({x: 10, y: 10});
 	const [starItem, setStarItem] = useState(null);
 	const [scissorsItem, setScissorsItem] = useState(null);
+	const [ghostItem, setGhostItem] = useState(null);
 
 	const snakeRef = useRef(snakeSegments);
 	const directionQueue = useRef([]);
 	const isSaved = useRef(false);
 
 	const [head, ...tail] = snakeSegments;
-	const intersects = tail.some(s => s.x === head.x && s.y === head.y);
+	const isColliding = tail.some(s => s.x === head.x && s.y === head.y);
+	const intersects = isColliding && !isGhostActive;
 
 	const restartGame = () => {
 		setSnakeSegments(INITIAL_SNAKE);
@@ -81,6 +84,8 @@ export default function App() {
 		setFoodItem(generateFood(INITIAL_SNAKE));
 		setStarItem(null);
 		setScissorsItem(null);
+		setGhostItem(null);
+		setIsGhostActive(false);
 		setScore(0);
 		setIsPaused(false);
 		setDelay(MIDDLE_SPEED);
@@ -212,10 +217,18 @@ export default function App() {
 			}
 		}, 45000);
 
+		const ghostInt = setInterval(() => {
+			if (isAdvancedMode) {
+				setGhostItem(generateFood(snakeRef.current));
+				setTimeout(() => setGhostItem(null), 4000);
+			}
+		}, 120000);
+
 		return () => {
 			clearInterval(fogInt);
 			clearInterval(starInt);
 			clearInterval(scissInt);
+			clearInterval(ghostInt);
 		};
 	}, [currentScreen, intersects, isAdvancedMode]);
 
@@ -234,6 +247,11 @@ export default function App() {
 			setSnakeSegments(prev => cutSnake(prev));
 			setScissorsItem(null);
 			setSessionStats(prev => ({...prev, scissorsUsed: prev.scissorsUsed + 1}));
+		}
+		if (isAdvancedMode && isItemEaten(head, ghostItem)) {
+			setIsGhostActive(true);
+			setGhostItem(null);
+			setTimeout(() => setIsGhostActive(false), 10000);
 		}
 	}, [head, foodItem, starItem, scissorsItem]);
 
@@ -300,6 +318,8 @@ export default function App() {
 					scissorsItem={scissorsItem}
 					skin={SKINS[selectedSkinIndex]}
 					isFogActive={isFogActive}
+					isGhostActive={isGhostActive}
+					ghostItem={ghostItem}
 				/>
 			)}
 
